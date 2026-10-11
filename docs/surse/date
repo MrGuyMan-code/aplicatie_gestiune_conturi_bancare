@@ -1,0 +1,18 @@
+Conform standardului bancar ISO 20022 și practicilor marilor bănci, pentru fiecare tranzacție se înregistrează două momente temporale distincte:
+📅 Cele două momente temporale
+
+1. Entry Date (sau AcceptanceDateTime)
+
+    Definiție: Data și ora la care tranzacția a fost primită pentru prima dată de sistemul bancar.
+
+    Rol: Reflectă intenția clientului și este folosită pentru sortare cronologică în interfețele de raportare în timp real.
+
+    Caracteristică: Poate fi o dată de weekend sau în afara orelor de program.
+
+2. Posting Date
+
+    Definiție: Data la care tranzacția a fost aplicată efectiv în cont și a afectat soldul.
+
+    Rol: Determină când banii contează efectiv în soldul contului.
+
+    Caracteristică: Este aliniată zilelor lucrătoare bancare și nu va apărea niciodată într-un weekend
