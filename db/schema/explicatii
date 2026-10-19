@@ -1,0 +1,2 @@
+0.1_create_tables.sql      #scriptul de a crea tabelele
+0.2_nuke_tables.sql        #scriptul de a distruge tabele (util in faza de proiectare)

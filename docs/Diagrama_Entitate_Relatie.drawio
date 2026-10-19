@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram name="Page-1" id="kpFaH3AqpxPxNLZ9x17y">
-    <mxGraphModel dx="3410" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2397" dy="1424" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -28,7 +28,7 @@
         <mxCell id="2hi20jEQM7cSBE3r2YV5-17" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Denumire" vertex="1">
           <mxGeometry height="40" width="90" x="840" y="300" as="geometry" />
         </mxCell>
-        <mxCell id="2hi20jEQM7cSBE3r2YV5-19" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="CNP" vertex="1">
+        <mxCell id="2hi20jEQM7cSBE3r2YV5-19" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="CUI" vertex="1">
           <mxGeometry height="40" width="90" x="940" y="310" as="geometry" />
         </mxCell>
         <mxCell id="2hi20jEQM7cSBE3r2YV5-21" parent="1" style="ellipse;whiteSpace=wrap;html=1;shapeInside=1;" value="Adresa" vertex="1">
