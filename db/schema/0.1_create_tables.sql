@@ -155,18 +155,7 @@ CREATE TABLE accounts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-
--- 7. TRANSACTION_SEQUENCES — contor pentru ID-ul compus (In versiunile ulterioare voi scapa de el)
-
-CREATE TABLE transaction_sequences (
-    node_code       VARCHAR(8)  NOT NULL,
-    sequence_date   DATE        NOT NULL,
-    current_value      BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    PRIMARY KEY (node_code, sequence_date)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- 8. TRANSACTIONS_COLD — date imutabile (nu se modifică niciodată)
+-- 7. TRANSACTIONS_COLD — date imutabile (nu se modifică niciodată)
 
 CREATE TABLE transactions_cold (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -209,7 +198,7 @@ CREATE TABLE transactions_cold (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- 9. TRANSACTIONS_HOT — date mutabile (starea curentă)
+-- 8. TRANSACTIONS_HOT — date mutabile (starea curentă)
 
 CREATE TABLE transactions_hot (
     transaction_id             BIGINT UNSIGNED NOT NULL,
@@ -240,7 +229,7 @@ CREATE TABLE transactions_hot (
         )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 10. LEDGER_ENTRIES — intrările contabile (la fiecare tranzactie reusita sunt 2 intrari ledger)
+-- 9. LEDGER_ENTRIES — intrările contabile (la fiecare tranzactie reusita sunt 2 intrari ledger)
 
 CREATE TABLE ledger_entries (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -272,7 +261,7 @@ CREATE TABLE ledger_entries (
         )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11 .USERS — conturile de aplicație ale clienților
+-- 10 .USERS — conturile de aplicație ale clienților
 
 CREATE TABLE users_app (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -295,4 +284,35 @@ CREATE TABLE users_app (
         ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT chk_users_status
         CHECK (status IN ('ACTIVE', 'BLOCKED', 'CLOSED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 11 Snapshots
+
+CREATE TABLE account_balance_snapshots (
+    id                      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    account_id              BIGINT UNSIGNED NOT NULL,          -- contul snapshot-uit
+    snapshot_date           DATE            NOT NULL,          -- data de referinta a snapshot-ului
+    snapshot_type           VARCHAR(16)     NOT NULL DEFAULT 'DAILY',
+    balance                 DECIMAL(20,4)   NOT NULL,          -- soldul contului la acest snapshot
+    currency                CHAR(3)         NOT NULL,          -- valuta soldului (consistenta cu accounts.currency)
+    last_ledger_entry_id    BIGINT UNSIGNED NULL,              -- ULTIMUL element din ledger inclus
+    last_ledger_created_at  DATETIME(6)     NULL,              -- timestamp-ul ultimei intrari incluse (watermark alternativ)
+    created_at              DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    -- un singur snapshot per cont / data / tip
+    UNIQUE KEY uq_abs_account_date_type (account_id, snapshot_date, snapshot_type),
+    -- cautare rapida: "care e ultimul snapshot al contului X?"
+    KEY idx_abs_account_date (account_id, snapshot_date DESC),
+    KEY idx_abs_snapshot_date (snapshot_date),
+    KEY idx_abs_last_ledger (last_ledger_entry_id),
+    CONSTRAINT fk_abs_account
+        FOREIGN KEY (account_id) REFERENCES accounts(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_abs_last_ledger
+        FOREIGN KEY (last_ledger_entry_id) REFERENCES ledger_entries(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_abs_type
+        CHECK (snapshot_type IN ('DAILY', 'MONTHLY', 'MANUAL', 'EOD')),
+    CONSTRAINT chk_abs_balance_non_negative
+        CHECK (balance >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
