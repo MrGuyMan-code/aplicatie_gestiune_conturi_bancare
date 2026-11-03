@@ -1,0 +1,93 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="AyDDqtsvzxeYhMrOmV_S">
+    <mxGraphModel dx="1449" dy="786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sys" parent="1" style="swimlane;html=1;startSize=30;rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;align=center;verticalAlign=top;" value="Aplicatie Gestiune Conturi Clienti" vertex="1">
+          <mxGeometry height="740" width="640" x="320" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ucTransfer" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Transfer fonduri" vertex="1">
+          <mxGeometry height="70" width="180" x="350" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ucSold" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Vizualizare sold" vertex="1">
+          <mxGeometry height="70" width="180" x="370" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ucIstoric" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Istoric tranzactii" vertex="1">
+          <mxGeometry height="70" width="180" x="390" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="ucLogout" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Delogare" vertex="1">
+          <mxGeometry height="70" width="180" x="20" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="ucLogin" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Autentificare" vertex="1">
+          <mxGeometry height="70" width="180" x="50" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="inc1" edge="1" parent="sys" source="ucTransfer" style="endArrow=open;dashed=1;html=1;rounded=0;endSize=12;fontSize=11;" target="ucLogin" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc2" edge="1" parent="sys" source="ucSold" style="endArrow=open;dashed=1;html=1;rounded=0;endSize=12;fontSize=11;" target="ucLogin" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inc3" edge="1" parent="sys" style="endArrow=open;dashed=1;html=1;rounded=0;endSize=12;fontSize=11;" target="ucLogin" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="449.03999999999996" y="432.14" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ucAdmin" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Vizualizeaza Rapoarte" vertex="1">
+          <mxGeometry height="70" width="180" x="60" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="inc4" edge="1" parent="sys" source="ucAdmin" style="endArrow=open;dashed=1;html=1;rounded=0;endSize=12;fontSize=11;" target="ucLogin" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b1a-WB4WgyJt-7yVVEsL-3" parent="sys" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Genereaza extrase cont" vertex="1">
+          <mxGeometry height="70" width="180" x="320" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="b1a-WB4WgyJt-7yVVEsL-5" edge="1" parent="sys" source="b1a-WB4WgyJt-7yVVEsL-3" style="endArrow=open;dashed=1;html=1;rounded=0;endSize=12;fontSize=11;entryX=0.602;entryY=0.953;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ucLogin" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="998" y="844" as="sourcePoint" />
+            <mxPoint x="720" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="actorClient" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Client" vertex="1">
+          <mxGeometry height="80" width="40" x="120" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="actorAdmin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Administrator" vertex="1">
+          <mxGeometry height="80" width="40" x="120" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" edge="1" parent="1" source="actorClient" style="endArrow=none;html=1;rounded=0;" target="ucLogin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" edge="1" parent="1" source="actorClient" style="endArrow=none;html=1;rounded=0;" target="ucTransfer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" edge="1" parent="1" source="actorClient" style="endArrow=none;html=1;rounded=0;" target="ucSold">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" edge="1" parent="1" source="actorClient" style="endArrow=none;html=1;rounded=0;" target="ucIstoric">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" edge="1" parent="1" source="actorClient" style="endArrow=none;html=1;rounded=0;" target="ucLogout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a6" edge="1" parent="1" source="actorAdmin" style="endArrow=none;html=1;rounded=0;" target="ucLogin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a7" edge="1" parent="1" source="actorAdmin" style="endArrow=none;html=1;rounded=0;" target="ucAdmin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="b1a-WB4WgyJt-7yVVEsL-4" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" target="b1a-WB4WgyJt-7yVVEsL-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="250" as="sourcePoint" />
+            <mxPoint x="1160" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fx7i3bj0e1QzK1c5YIwh-1" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="ucLogout">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="540" as="sourcePoint" />
+            <mxPoint x="1404" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

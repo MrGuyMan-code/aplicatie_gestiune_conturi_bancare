@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'screens/dashboard_screen.dart';
 import 'screens/login_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade800),
         useMaterial3: true,
       ),
-      home: const LoginScreen(), // Trimitem utilizatorul direct la ecranul de login
+      home:  LoginScreen(), // Trimitem utilizatorul direct la ecranul de login
     );
   }
 }

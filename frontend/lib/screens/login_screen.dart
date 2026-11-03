@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+import 'dashboard_screen.dart'; // Vei avea nevoie de el pentru navigare
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -8,6 +10,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _isLoading = false;
   // Controlere pentru a lua textul introdus de utilizator
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -20,6 +23,54 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // =========================================================
+  // FUNCȚIA DE LOGIN (Adăugată aici, fără a modifica design-ul)
+  // =========================================================
+  Future<void> _handleLogin() async {
+    // 1. Validare simplă
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Te rog completează email-ul și parola!')),
+      );
+      return;
+    }
+
+    // 2. Pornim loading-ul
+    setState(() {
+      _isLoading = true;
+    });
+
+    // 3. Apelăm serviciul de autentificare
+    final authService = AuthService();
+    final result = await authService.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+    );
+
+    // 4. Oprim loading-ul
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
+
+    // 5. Verificăm rezultatul și navigăm
+    if (result != null && result['accounts'] != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardScreen(accounts: result['accounts']),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Email sau parolă incorectă!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -96,13 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Butonul de Login
+                // Butonul de Login (Am modificat DOAR onPressed și child-ul)
                 ElevatedButton(
-                  onPressed: () {
-                    // Aici vom pune logica de conectare mai târziu
-                    print('Email: ${_emailController.text}');
-                    print('Parolă: ${_passwordController.text}');
-                  },
+                  onPressed: _isLoading ? null : _handleLogin, // <-- Apelează funcția
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade800,
                     foregroundColor: Colors.white,
@@ -111,10 +158,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Autentificare',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Autentificare',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ],
             ),
