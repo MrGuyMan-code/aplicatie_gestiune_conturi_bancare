@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+import 'login_screen.dart';
+import 'statement_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final List<dynamic> accounts; // <--- Am adăugat câmpul pentru conturi
@@ -31,6 +34,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: Colors.blue.shade800,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Delogare',
+            onPressed: () async {
+              // 1. Ștergem token-ul din memoria securizată
+              await AuthService().logout();
+              
+              // 2. Ne întoarcem la ecranul de login (ștergem istoricul)
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -86,8 +108,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: Icons.receipt_long,
                   label: 'Generează Extras',
                   onTap: () {
-                    // Folosim widget.accounts
-                    print('Se generează extrasul pentru IBAN: ${widget.accounts[_currentIndex]['iban']}');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StatementScreen(
+                          accounts: widget.accounts, // Trimitem toată lista
+                          initialIban: widget.accounts[_currentIndex]['iban'], // Contul selectat din carusel
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 15),
