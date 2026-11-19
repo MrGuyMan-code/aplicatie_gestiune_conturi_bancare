@@ -1,5 +1,6 @@
 package com.bank.app.controllers;
 
+import com.bank.app.dtos.StatementEntry;
 import com.bank.app.entities.Account;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
@@ -73,11 +74,13 @@ public class StatementController {
             LocalDateTime endDateTime = end.atTime(23, 59, 59);
 
             BigDecimal initialBalance = statementService.calculateInitialBalance(account.getId(), startDateTime);
-            List<LedgerEntry> entries = statementService.getEntriesBetween(account.getId(), startDateTime, endDateTime);
+            
+            // AICI: Folosim noua metodă care returnează List<StatementEntry>
+            List<StatementEntry> entries = statementService.getStatementEntries(account.getId(), startDateTime, endDateTime);
 
             BigDecimal finalBalance = initialBalance;
-            for (LedgerEntry entry : entries) {
-                finalBalance = finalBalance.add(entry.getAmount());
+            for (StatementEntry entry : entries) {
+                finalBalance = finalBalance.add(entry.amount()); // <--- atenție la `.amount()`, nu `.getAmount()`
             }
 
             byte[] pdfBytes = pdfGenerator.generatePdf(account, start, end, initialBalance, finalBalance, entries);

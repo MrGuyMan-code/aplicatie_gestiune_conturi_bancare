@@ -21,6 +21,8 @@ DROP TABLE IF EXISTS clienti;
 DROP TABLE IF EXISTS metode_contact;
 DROP TABLE IF EXISTS persoane_juridice;
 DROP TABLE IF EXISTS persoane_fizice;
+DROP TABLE IF EXISTS account_balance_snapshots;
+DROP TABLE IF EXISTS users_app;
 
 -- Reactivare verificare FK
 SET FOREIGN_KEY_CHECKS = 1;

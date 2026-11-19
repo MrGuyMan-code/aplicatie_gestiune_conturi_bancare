@@ -128,7 +128,7 @@ CREATE TABLE contacte (
 CREATE TABLE accounts (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     iban            VARCHAR(34)  NOT NULL,
-    client_id       BIGINT UNSIGNED NOT NULL,
+    client_id       BIGINT UNSIGNED,
     account_type    VARCHAR(16)  NOT NULL,	-- tip cont
     currency        CHAR(3)      NOT NULL DEFAULT 'RON',
     balance         DECIMAL(20,4) NOT NULL DEFAULT 0.0000, -- am pus balanta cu mai multe 0 pentru a evita erori de rotunjire
@@ -147,7 +147,7 @@ CREATE TABLE accounts (
         FOREIGN KEY (client_id) REFERENCES clienti(id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT chk_accounts_type
-        CHECK (account_type IN ('CURRENT', 'SAVINGS', 'CREDIT')),
+        CHECK (account_type IN ('CURRENT', 'SAVINGS', 'CREDIT', 'INTERNAL')),
     CONSTRAINT chk_accounts_status
         CHECK (status IN ('ACTIVE', 'BLOCKED', 'CLOSED')),
     CONSTRAINT chk_accounts_balance_non_negative
@@ -155,7 +155,18 @@ CREATE TABLE accounts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- 7. TRANSACTIONS_COLD — date imutabile (nu se modifică niciodată)
+
+-- 7. TRANSACTION_SEQUENCES — contor pentru ID-ul compus (In versiunile ulterioare voi scapa de el)
+/*
+CREATE TABLE transaction_sequences (
+    node_code       VARCHAR(8)  NOT NULL,
+    sequence_date   DATE        NOT NULL,
+    current_value      BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (node_code, sequence_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+*/
+
+-- 8. TRANSACTIONS_COLD — date imutabile (nu se modifică niciodată)
 
 CREATE TABLE transactions_cold (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -186,7 +197,7 @@ CREATE TABLE transactions_cold (
 	    FOREIGN KEY (target_account_id) REFERENCES accounts(id)
 	    ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT chk_transactions_cold_type
-        CHECK (transaction_type IN ('TRF', 'DEP', 'WDR', 'FEE', 'INT', 'REV')),
+        CHECK (transaction_type IN ('TRF', 'DEP_CASH', 'WDR_CASH', 'DEP_ATM', 'WDR_ATM', 'FEE', 'INT', 'REV')),
     CONSTRAINT chk_transactions_cold_amount_positive
         CHECK (amount > 0),
     CONSTRAINT chk_transactions_cold_has_account
@@ -198,7 +209,7 @@ CREATE TABLE transactions_cold (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- 8. TRANSACTIONS_HOT — date mutabile (starea curentă)
+-- 9. TRANSACTIONS_HOT — date mutabile (starea curentă)
 
 CREATE TABLE transactions_hot (
     transaction_id             BIGINT UNSIGNED NOT NULL,
@@ -229,7 +240,7 @@ CREATE TABLE transactions_hot (
         )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 9. LEDGER_ENTRIES — intrările contabile (la fiecare tranzactie reusita sunt 2 intrari ledger)
+-- 10. LEDGER_ENTRIES — intrările contabile (la fiecare tranzactie reusita sunt 2 intrari ledger)
 
 CREATE TABLE ledger_entries (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -237,7 +248,8 @@ CREATE TABLE ledger_entries (
     account_id      BIGINT UNSIGNED NOT NULL,
     amount          DECIMAL(20,4) NOT NULL,
     entry_type      VARCHAR(8)   NOT NULL,
-    currency        CHAR(3)      NOT NULL DEFAULT 'RON',
+    currency        CHAR(3)      NOT NULL,
+    deleted 		TINYINT(1) NOT NULL DEFAULT 0,
     created_at      DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     PRIMARY KEY (id),
     KEY idx_ledger_transaction (transaction_id),
@@ -261,7 +273,7 @@ CREATE TABLE ledger_entries (
         )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 10 .USERS — conturile de aplicație ale clienților
+-- 11 .USERS — conturile de aplicație ale clienților
 
 CREATE TABLE users_app (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -286,12 +298,12 @@ CREATE TABLE users_app (
         CHECK (status IN ('ACTIVE', 'BLOCKED', 'CLOSED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11 Snapshots
+-- 12 Snapshots
 
 CREATE TABLE account_balance_snapshots (
     id                      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     account_id              BIGINT UNSIGNED NOT NULL,          -- contul snapshot-uit
-    snapshot_date           DATE            NOT NULL,          -- data de referinta a snapshot-ului
+    snapshot_datetime           DATETIME(6)            NOT NULL,          -- data de referinta a snapshot-ului
     snapshot_type           VARCHAR(16)     NOT NULL DEFAULT 'DAILY',
     balance                 DECIMAL(20,4)   NOT NULL,          -- soldul contului la acest snapshot
     currency                CHAR(3)         NOT NULL,          -- valuta soldului (consistenta cu accounts.currency)
@@ -300,10 +312,10 @@ CREATE TABLE account_balance_snapshots (
     created_at              DATETIME(6)     NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     PRIMARY KEY (id),
     -- un singur snapshot per cont / data / tip
-    UNIQUE KEY uq_abs_account_date_type (account_id, snapshot_date, snapshot_type),
+    UNIQUE KEY uq_abs_account_date_type (account_id, snapshot_datetime, snapshot_type),
     -- cautare rapida: "care e ultimul snapshot al contului X?"
-    KEY idx_abs_account_date (account_id, snapshot_date DESC),
-    KEY idx_abs_snapshot_date (snapshot_date),
+    KEY idx_abs_account_date (account_id, snapshot_datetime DESC),
+    KEY idx_abs_snapshot_date (snapshot_datetime),
     KEY idx_abs_last_ledger (last_ledger_entry_id),
     CONSTRAINT fk_abs_account
         FOREIGN KEY (account_id) REFERENCES accounts(id)

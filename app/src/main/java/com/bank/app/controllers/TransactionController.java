@@ -19,8 +19,8 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<?> getTransactions(
             @RequestParam("iban") String iban,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size) {
         try {
             Page<TransactionDto> result = transactionService.getTransactions(iban, page, size);
             return ResponseEntity.ok(result);

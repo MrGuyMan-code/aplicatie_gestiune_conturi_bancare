@@ -8,5 +8,6 @@ public record TransactionDto(
     String description,
     BigDecimal amount,
     String type,
-    String transactionRef
+    String transactionRef,
+    String otherIban
 ) {}

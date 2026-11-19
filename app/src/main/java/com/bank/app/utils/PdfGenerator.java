@@ -1,7 +1,7 @@
 package com.bank.app.utils;
 
 import com.bank.app.entities.Account;
-import com.bank.app.entities.LedgerEntry;
+import com.bank.app.dtos.StatementEntry;
 import com.lowagie.text.Document;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
@@ -19,7 +19,7 @@ public class PdfGenerator {
 
     public byte[] generatePdf(Account account, LocalDate start, LocalDate end,
                               BigDecimal initialBalance, BigDecimal finalBalance,
-                              List<LedgerEntry> entries) throws Exception {
+                              List<StatementEntry> entries) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document document = new Document();
         PdfWriter.getInstance(document, out);
@@ -34,18 +34,20 @@ public class PdfGenerator {
         document.add(new Paragraph(" "));
 
         // Tabel cu tranzacții
-        PdfPTable table = new PdfPTable(4);
+        PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.addCell("Data");
         table.addCell("Descriere");
+        table.addCell("Cont");
         table.addCell("Suma");
         table.addCell("Tip");
 
-        for (LedgerEntry entry : entries) {
-            table.addCell(entry.getCreatedAt().toLocalDate().toString());
-            table.addCell("Tranzactie"); // Momentan generic
-            table.addCell(entry.getAmount().toString());
-            table.addCell(entry.getEntryType());
+        for (StatementEntry entry : entries) {
+        	table.addCell(entry.date().toLocalDate().toString());
+            table.addCell(entry.description());
+            table.addCell(entry.otherIban());
+            table.addCell(entry.amount().toString());
+            table.addCell(entry.type());
         }
         document.add(table);
 

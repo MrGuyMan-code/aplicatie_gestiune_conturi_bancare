@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/transaction_service.dart';
+import 'package:intl/intl.dart';
 
 class TransactionsScreen extends StatefulWidget {
   final String iban;
@@ -66,7 +67,21 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             color: isDebit ? Colors.red : Colors.green,
                           ),
                           title: Text(tx['description'] ?? 'Fără descriere'),
-                          subtitle: Text(tx['date']?.toString().substring(0, 16) ?? ''),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                tx['date'] != null
+                                    ? DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(tx['date']))
+                                    : '',
+                              ),
+                              if (tx['otherIban'] != null && tx['otherIban'] != 'N/A')
+                                Text(
+                                  'Cont: ${tx['otherIban']}',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                ),
+                            ],
+                          ),
                           trailing: Text(
                             '${isDebit ? '-' : '+'}${amount.abs().toStringAsFixed(2)} RON',
                             style: TextStyle(

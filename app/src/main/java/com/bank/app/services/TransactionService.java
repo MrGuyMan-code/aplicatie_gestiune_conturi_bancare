@@ -55,17 +55,39 @@ public class TransactionService {
         // 4. Luăm intrările din ledger
         Page<LedgerEntry> ledgerPage = ledgerEntryRepository.findByAccountId(account.getId(), pageRequest);
 
-        // 5. Mapăm fiecare LedgerEntry la TransactionDto, luând descrierea din transactions_cold
+        // 5. Mapăm fiecare LedgerEntry la TransactionDto, calculând și IBAN-ul celuilalt cont
         return ledgerPage.map(entry -> {
             TransactionsCold tx = transactionsColdRepository.findById(entry.getTransactionId()).orElse(null);
+            
             String description = tx != null ? tx.getDescription() : "N/A";
             String ref = tx != null ? tx.getTransactionRef() : "N/A";
+            
+            // Calculăm IBAN-ul celuilalt cont
+            String otherIban = "N/A";
+            if (tx != null) {
+                Long otherAccountId = null;
+                if ("DEBIT".equals(entry.getEntryType())) {
+                    // Dacă e debit, celălalt cont este target
+                    otherAccountId = tx.getTargetAccountId();
+                } else {
+                    // Dacă e credit, celălalt cont este source
+                    otherAccountId = tx.getSourceAccountId();
+                }
+                
+                if (otherAccountId != null) {
+                    Account otherAccount = accountRepository.findById(otherAccountId).orElse(null);
+                    if (otherAccount != null) {
+                        otherIban = otherAccount.getIban();
+                    }
+                }
+            }
             return new TransactionDto(
                 entry.getCreatedAt(),
                 description,
                 entry.getAmount(),
                 entry.getEntryType(),
-                ref
+                ref,
+                otherIban
             );
         });
     }
