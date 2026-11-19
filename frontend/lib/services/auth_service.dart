@@ -43,6 +43,30 @@ class AuthService {
     }
   }
 
+    Future<List<dynamic>?> getMyAccounts() async {
+    try {
+      final token = await _storage.read(key: 'jwt_token');
+      if (token == null) return null;
+
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8080/api/accounts'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Eroare la obținerea conturilor: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Eroare rețea: $e');
+      return null;
+    }
+  }
+
   // Funcție ajutătoare pentru logout (o vom folosi mai târziu)
   Future<void> logout() async {
     await _storage.delete(key: 'jwt_token');

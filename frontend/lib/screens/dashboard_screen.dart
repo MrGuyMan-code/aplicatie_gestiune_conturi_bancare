@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
 import 'statement_screen.dart';
+import 'transfer_screen.dart';
+import 'transactions_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final List<dynamic> accounts; // <--- Am adăugat câmpul pentru conturi
@@ -18,6 +20,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   
   // Controller pentru a putea schimba pagina din cod (dacă e nevoie)
   final PageController _pageController = PageController(viewportFraction: 0.85);
+
+  Future<void> _refreshAccounts() async {
+  try {
+    final authService = AuthService();
+    final newAccounts = await authService.getMyAccounts();
+    if (newAccounts != null) {
+      setState(() {
+        widget.accounts.clear();
+        widget.accounts.addAll(newAccounts);
+      });
+    }
+  } catch (e) {
+    print('Eroare la reîmprospătare: $e');
+  }
+}
 
   @override
   void dispose() {
@@ -124,7 +141,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: Icons.history,
                   label: 'Vizualizare Tranzacții',
                   onTap: () {
-                    print('Se afișează tranzacțiile pentru IBAN: ${widget.accounts[_currentIndex]['iban']}');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TransactionsScreen(
+                          iban: widget.accounts[_currentIndex]['iban'],
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 15),
@@ -132,8 +156,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   icon: Icons.swap_horiz,
                   label: 'Realizează Transfer',
                   iconColor: Colors.green.shade700,
-                  onTap: () {
-                    print('Se inițiază transferul din contul: ${widget.accounts[_currentIndex]['iban']}');
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TransferScreen(
+                          accounts: widget.accounts,
+                          initialIban: widget.accounts[_currentIndex]['iban'],
+                        ),
+                      ),
+                    );
+
+                    // Dacă TransferScreen a returnat `true`, înseamnă că a avut loc un transfer
+                    if (result == true) {
+                      _refreshAccounts(); // <--- Reîncărcăm datele
+                    }
                   },
                 ),
               ],
