@@ -11,6 +11,7 @@ class TransferService {
     required String targetIban,
     required double amount,
     required String description,
+    required String idempotencyKey, 
   }) async {
     try {
       // 1. Luăm token-ul JWT
@@ -29,6 +30,7 @@ class TransferService {
           'targetIban': targetIban,
           'amount': amount,
           'description': description,
+          'idempotencyKey': idempotencyKey,
         }),
       );
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/transfer_service.dart';
+import 'package:uuid/uuid.dart';
 
 class TransferScreen extends StatefulWidget {
   final List<dynamic> accounts;     // Lista de conturi
@@ -59,6 +60,7 @@ class _TransferScreenState extends State<TransferScreen> {
     // 2. Pornim loading-ul
     setState(() => _isLoading = true);
 
+    final idempotencyKey = const Uuid().v4();
     // 3. Apelăm serviciul
     final service = TransferService();
     final errorMessage = await service.executeTransfer(
@@ -66,6 +68,7 @@ class _TransferScreenState extends State<TransferScreen> {
       targetIban: _targetIbanController.text.trim(),
       amount: amount,
       description: _descriptionController.text.trim(),
+      idempotencyKey: idempotencyKey,
     );
 
     // 4. Oprim loading-ul

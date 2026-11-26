@@ -6,5 +6,6 @@ public record TransferRequest(
     String sourceIban,
     String targetIban,
     BigDecimal amount,
-    String description
+    String description,
+    String idempotencyKey 
 ) {}

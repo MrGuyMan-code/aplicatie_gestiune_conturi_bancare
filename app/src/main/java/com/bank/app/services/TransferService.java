@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,7 +37,16 @@ public class TransferService {
 
     @Transactional
     public TransferResponse executeTransfer(TransferRequest request) {
-        // 1. Validări de bază
+        
+    	// Verifică idempotența
+    	if (request.idempotencyKey() != null && !request.idempotencyKey().isEmpty()) {
+    	    Optional<TransactionsCold> existing = transactionsColdRepository.findByIdempotencyKey(request.idempotencyKey());
+    	    if (existing.isPresent()) {
+    	        return new TransferResponse("Transfer deja efectuat.", existing.get().getTransactionRef());
+    	    }
+    	}
+    	
+    	// 1. Validări de bază
         if (request.amount() == null || request.amount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Suma trebuie să fie mai mare decât zero.");
         }

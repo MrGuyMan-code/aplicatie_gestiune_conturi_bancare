@@ -64,12 +64,17 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     } else {
+    // Eroare: afișăm mesajul primit de la server
+    final errorMessage = result?['error'] ?? 'Eroare necunoscută.';
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Email sau parolă incorectă!'),
+        SnackBar(
+          content: Text(errorMessage),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
         ),
       );
+    }
     }
   }
 

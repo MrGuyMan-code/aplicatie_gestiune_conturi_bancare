@@ -9,39 +9,28 @@ class AuthService {
   // Obiect pentru salvarea securizată a token-ului
   final _storage = const FlutterSecureStorage();
 
-  // Funcția care face login-ul
-  Future<Map<String, dynamic>?> login(String email, String password) async {
-    try {
-      // 1. Trimitem cererea POST către Spring Boot
-      final response = await http.post(
-        Uri.parse('$baseUrl/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
+Future<Map<String, dynamic>?> login(String email, String password) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
 
-      // 2. Verificăm dacă răspunsul este OK (200)
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        
-        // 3. Salvăm token-ul în memoria securizată a telefonului
-        if (data['token'] != null) {
-          await _storage.write(key: 'jwt_token', value: data['token']);
-        }
-        
-        // 4. Returnăm datele primite (token + lista de conturi)
-        return data;
-      } else {
-        print('Eroare login: ${response.statusCode} - ${response.body}');
-        return null; // Login eșuat
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['token'] != null) {
+        await _storage.write(key: 'jwt_token', value: data['token']);
       }
-    } catch (e) {
-      print('Eroare de rețea: $e');
-      return null;
+      return data; // succes
+    } else {
+      // Returnăm mesajul de eroare primit de la server
+      return {'error': response.body};
     }
+  } catch (e) {
+    return {'error': 'Eroare de rețea: $e'};
   }
+}
 
     Future<List<dynamic>?> getMyAccounts() async {
     try {
