@@ -50,7 +50,8 @@ public class TransactionService {
         }
 
         // 3. Paginare: pagina 0, sortare descendentă după created_at
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        //PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("created_at").descending());
 
         // 4. Luăm intrările din ledger
         Page<LedgerEntry> ledgerPage = ledgerEntryRepository.findByAccountId(account.getId(), pageRequest);
